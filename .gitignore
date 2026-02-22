@@ -31,4 +31,6 @@
 *.out
 *.app
 
+NsightCompute
+
 \.DS_Store
