@@ -77,6 +77,10 @@ __global__ void kern_find_peak(float* d_block_vals, int* d_block_idxs,
     s_idxs[tid] = (idx < n) ? idx : -1;
     __syncthreads();
 
+    /* Tree-based parallel reduction: each iteration halves the stride.
+       Pass 1: threads 0..N/2-1 compare against N/2..N-1
+       Pass 2: threads 0..N/4-1 compare against N/4..N/2-1
+       ...until thread 0 holds the block-wide maximum. */
     for (int s = blockDim.x / 2; s > 0; s >>= 1) {
         if (tid < s && s_vals[tid + s] > s_vals[tid]) {
             s_vals[tid] = s_vals[tid + s];
